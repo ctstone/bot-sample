@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./dist",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc-watch --onSuccess \"npm run start\""
+    "watch": "tsc-watch --onSuccess \"npm run start\"",
+    "prepublish": "npm run build"
   },
   "keywords": [],
   "author": "",
