@@ -1,5 +1,9 @@
 # Bot Sample
 
+> This project uses private builds available only on a private npm repo. Before continuing make sure you run the following in this repo: `vsts-npm-auth -config .npmrc`.
+>
+> If you do not have `vsts-npm-auth`, you can install it with: `npm install -g vsts-npm-auth --registry https://registry.npmjs.com --always-auth false`
+
 To configure this sample, create a file in the root of the repo called `.env` with contents:
 
 ```ini
