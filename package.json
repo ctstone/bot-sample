@@ -1,28 +1,38 @@
 {
   "name": "bot-test",
   "version": "1.0.0",
-  "description": "",
+  "description": "> This project uses private builds available only on a private npm repo. Before continuing make sure you run the following in this repo: `vsts-npm-auth -config .npmrc`.\r >\r > If you do not have `vsts-npm-auth`, you can install it with: `npm install -g vsts-npm-auth --registry https://registry.npmjs.com --always-auth false`",
   "main": "index.js",
   "scripts": {
-    "start": "node ./dist",
+    "start": "tsc-watch --onSuccess \"node ./dist\"",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc-watch --onSuccess \"npm run start\"",
     "prepublish": "npm run build"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "chstone",
+  "license": "MIT",
   "dependencies": {
-    "botbuilder": "^4.0.0-aicat1.1",
+    "@types/documentdb": "^1.10.5",
+    "@types/dotenv": "^4.0.3",
+    "@types/express": "^4.16.0",
+    "applicationinsights": "^1.0.3",
+    "botbuilder": "4.0.0-aicat1.2",
+    "botbuilder-feedback": "^4.0.5",
+    "botbuilder-transcript-app-insights": "^4.0.13",
+    "botbuilder-transcript-cosmosdb": "^4.0.11",
+    "documentdb": "^1.14.5",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "tsc-watch": "^1.0.27",
     "tslint": "^5.11.0",
     "typescript": "^3.0.1"
   },
-  "devDependencies": {
-    "@types/dotenv": "^4.0.3",
-    "@types/express": "^4.16.0",
-    "tsc-watch": "^1.0.27"
-  }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ctstone/bot-sample.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ctstone/bot-sample/issues"
+  },
+  "homepage": "https://github.com/ctstone/bot-sample#readme"
 }
