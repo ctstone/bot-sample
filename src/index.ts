@@ -27,7 +27,8 @@ const adapter = new BotFrameworkAdapter({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD,
   })
-  .use(conversationState, feedback, logger);
+  .use(logger, conversationState, feedback)
+  ;
 const port = process.env.PORT || 3978;
 express()
   .post('/api/messages', (req, res, next) => adapter.processActivity(req, res, async (context: TurnContext) => {
@@ -43,6 +44,10 @@ express()
         } else {
           await context.sendActivity(`You said '${context.activity.text}`);
         }
+        break;
+
+      default:
+        await context.sendActivity(context.activity.type);
         break;
     }
   }).catch(next))
