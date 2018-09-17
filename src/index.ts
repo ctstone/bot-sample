@@ -1,6 +1,11 @@
 import { TelemetryClient } from 'applicationinsights';
-import { ActivityTypes, BotFrameworkAdapter, ConsoleTranscriptLogger, ConversationState, MemoryStorage, TranscriptLoggerMiddleware, TurnContext } from 'botbuilder';
+import {
+  ActivityTypes, AutoSaveStateMiddleware, BotFrameworkAdapter,
+  ConsoleTranscriptLogger, ConversationState, MemoryStorage,
+  TranscriptLoggerMiddleware, TurnContext } from 'botbuilder';
+import { LuisRecognizer } from 'botbuilder-ai';
 import { Feedback } from 'botbuilder-feedback';
+import { HttpTestRecorder } from 'botbuilder-http-test-recorder';
 import { AppInsightsTranscriptStore } from 'botbuilder-transcript-app-insights';
 import { CosmosDbTranscriptStore } from 'botbuilder-transcript-cosmosdb';
 import { DocumentClient } from 'documentdb';
@@ -20,35 +25,42 @@ const logstore =
   // })
   ;
 
+const luis = new LuisRecognizer({
+  applicationId: process.env.LUIS_APP_ID,
+  endpointKey: process.env.LUIS_KEY,
+  endpoint: process.env.LUIS_ENDPOINT,
+});
+const testRecorder = new HttpTestRecorder()
+  .captureLuis()
+  .captureAzureSearch();
 const conversationState = new ConversationState(new MemoryStorage());
-const feedback = new Feedback({ conversationState });
+const saveState = new AutoSaveStateMiddleware(conversationState);
+const feedback = new Feedback(conversationState, {
+  feedbackActions: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+  promptFreeForm: ['3'],
+});
 const logger = new TranscriptLoggerMiddleware(logstore);
 const adapter = new BotFrameworkAdapter({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD,
   })
-  .use(logger, conversationState, feedback)
-  ;
+  .use(
+    testRecorder,
+    logger,
+    saveState,
+    feedback,
+  );
 const port = process.env.PORT || 3978;
 express()
   .post('/api/messages', (req, res, next) => adapter.processActivity(req, res, async (context: TurnContext) => {
-    switch (context.activity.type) {
-      case ActivityTypes.ConversationUpdate:
-        await context.sendActivity(`Welcome, ${context.activity.membersAdded.map((x) => x.name).join(', ')}`);
-        break;
-
-      case ActivityTypes.Message:
-        if (context.activity.text === 'what?') {
-          const message = Feedback.requestFeedback(context, 'the answer is FOO');
-          await context.sendActivity(message);
-        } else {
-          await context.sendActivity(`You said '${context.activity.text}`);
-        }
-        break;
-
-      default:
-        await context.sendActivity(context.activity.type);
-        break;
+    if (context.activity.type === ActivityTypes.Message) {
+      if (context.activity.text.toLowerCase().startsWith('what is the meaning of life')) {
+        const results = await luis.recognize(context);
+        console.log(results);
+        await Feedback.sendFeedbackActivity(context, '42');
+      } else {
+        await context.sendActivity(`You said '${context.activity.text}'`);
+      }
     }
   }).catch(next))
   .listen(port, () => console.log(`Listening on ${port}`));
