@@ -30,11 +30,6 @@ const luis = new LuisRecognizer({
   endpointKey: process.env.LUIS_KEY,
   endpoint: process.env.LUIS_ENDPOINT, // e.g: https://westus.api.cognitive.microsoft.com
 });
-console.log({
-  applicationId: process.env.LUIS_APP_ID,
-  endpointKey: process.env.LUIS_KEY,
-  endpoint: process.env.LUIS_ENDPOINT,
-});
 const testRecorder = new HttpTestRecorder()
   .captureLuis()
   .captureAzureSearch();
