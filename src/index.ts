@@ -28,13 +28,18 @@ const logstore =
 const luis = new LuisRecognizer({
   applicationId: process.env.LUIS_APP_ID,
   endpointKey: process.env.LUIS_KEY,
+  endpoint: process.env.LUIS_ENDPOINT, // e.g: https://westus.api.cognitive.microsoft.com
+});
+console.log({
+  applicationId: process.env.LUIS_APP_ID,
+  endpointKey: process.env.LUIS_KEY,
   endpoint: process.env.LUIS_ENDPOINT,
 });
 const testRecorder = new HttpTestRecorder()
   .captureLuis()
   .captureAzureSearch();
 const conversationState = new ConversationState(new MemoryStorage());
-const saveState = new AutoSaveStateMiddleware(conversationState);
+const autoSaveState = new AutoSaveStateMiddleware(conversationState);
 const feedback = new Feedback(conversationState, {
   feedbackActions: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
   promptFreeForm: ['3'],
@@ -47,14 +52,14 @@ const adapter = new BotFrameworkAdapter({
   .use(
     testRecorder,
     logger,
-    saveState,
+    autoSaveState,
     feedback,
   );
 const port = process.env.PORT || 3978;
 express()
   .post('/api/messages', (req, res, next) => adapter.processActivity(req, res, async (context: TurnContext) => {
     if (context.activity.type === ActivityTypes.Message) {
-      if (context.activity.text.toLowerCase().startsWith('what is the meaning of life')) {
+      if (context.activity.text.toLowerCase().startsWith('what')) {
         const results = await luis.recognize(context);
         console.log(results);
         await Feedback.sendFeedbackActivity(context, '42');

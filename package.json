@@ -18,7 +18,7 @@
     "applicationinsights": "^1.0.4",
     "botbuilder": "^4.0.1-aicat1.4",
     "botbuilder-ai": "^4.0.1-aicat1.4",
-    "botbuilder-feedback": "^4.0.14",
+    "botbuilder-feedback": "^4.0.15",
     "botbuilder-http-test-recorder": "^4.0.8",
     "botbuilder-transcript-app-insights": "^4.0.15",
     "botbuilder-transcript-cosmosdb": "^4.0.13",
